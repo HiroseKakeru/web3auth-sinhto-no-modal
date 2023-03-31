@@ -11,7 +11,7 @@ export const Callback = () => {
     const query = useQuery();
     return (
         <>
-            <h1>Callback {query.get("token")}</h1>
+            <h1>aCallback {query.get("token")}</h1>
         </>
     );
 };

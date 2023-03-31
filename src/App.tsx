@@ -9,6 +9,7 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import "./App.css";
 // import RPC from './ethersRPC' // for using ethers.js
 import RPC from "./web3RPC"; // for using web3.js
+import { Link } from 'react-router-dom';
 
 const clientId = process.env.REACT_APP_CLIENT_ID!
 
@@ -239,10 +240,13 @@ export const App = ()  => {
         <a target="_blank" href="http://web3auth.io/" rel="noreferrer">
           Web3Auth
         </a>{" "}
-        & ReactJS Example using Auth0
+        & ReactJS Example using Auth01
       </h1>
 
       <div className="grid">{provider ? loggedInView : unloggedInView}</div>
+      <Link to="/callback">
+        <a>callback</a>
+      </Link>
 
       <footer className="footer">
         <a
