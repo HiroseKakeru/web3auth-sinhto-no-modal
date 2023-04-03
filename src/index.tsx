@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 //import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 
 import { App } from "./App";
 import { Callback } from "./Callback";
@@ -12,12 +12,12 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <BrowserRouter basename='web3auth-sinhto-no-modal'>
-    <Routes >
+  <HashRouter>
+    <Routes>
       <Route path="/" element={<App />} />
       <Route path="/callback" element={<Callback />} />
     </Routes>
-  </BrowserRouter>
+  </HashRouter>
 );
 
 // export const AppRouting = () => {
