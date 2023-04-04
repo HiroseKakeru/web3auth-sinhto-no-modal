@@ -9,18 +9,17 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import "./App.css";
 // import RPC from './ethersRPC' // for using ethers.js
 import RPC from "./web3RPC"; // for using web3.js
-import { Link } from 'react-router-dom';
+import { Link, redirect } from 'react-router-dom';
 
 const clientId = process.env.REACT_APP_CLIENT_ID!
+const houzinURL = process.env.REACT_APP_HOUZIN_URL!
 
-export const App = ()  => {
+export const App = () => {
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  
-  console.log(process.env.REACT_APP_CLIENT_ID!);
-  
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -62,22 +61,34 @@ export const App = ()  => {
   }, []);
 
   const login = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    const web3authProvider = await web3auth.connectTo(
-      WALLET_ADAPTERS.OPENLOGIN,
-      {
-        loginProvider: "jwt",
-        extraLoginOptions: {
-          domain: "https://shahbaz-torus.us.auth0.com",
-          verifierIdField: "sub",
-          // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
-        },
-      }
-    );
-    setProvider(web3authProvider);
+    const res = await fetch(houzinURL + "/supay/login", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    const url = data?.data.sinhto_url;
+    console.log(url);
+    // ↓リダイレクトできていない
+    return redirect(url);
+
+    // if (!web3auth) {
+    //   uiConsole("web3auth not initialized yet");
+    //   return;
+    // }
+    // const web3authProvider = await web3auth.connectTo(
+    //   WALLET_ADAPTERS.OPENLOGIN,
+    //   {
+    //     loginProvider: "jwt",
+    //     extraLoginOptions: {
+    //       domain: "https://shahbaz-torus.us.auth0.com",
+    //       verifierIdField: "sub",
+    //       // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
+    //     },
+    //   }
+    // );
+    // setProvider(web3authProvider);
   };
 
   const authenticateUser = async () => {
@@ -173,66 +184,66 @@ export const App = ()  => {
     uiConsole(privateKey);
   };
 
-  const loggedInView = (
-    <>
-      <div className="flex-container">
-        <div>
-          <button onClick={getUserInfo} className="card">
-            Get User Info
-          </button>
-        </div>
-        <div>
-          <button onClick={authenticateUser} className="card">
-            Get ID Token
-          </button>
-        </div>
-        <div>
-          <button onClick={getChainId} className="card">
-            Get Chain ID
-          </button>
-        </div>
-        <div>
-          <button onClick={getAccounts} className="card">
-            Get Accounts
-          </button>
-        </div>
-        <div>
-          <button onClick={getBalance} className="card">
-            Get Balance
-          </button>
-        </div>
-        <div>
-          <button onClick={signMessage} className="card">
-            Sign Message
-          </button>
-        </div>
-        <div>
-          <button onClick={sendTransaction} className="card">
-            Send Transaction
-          </button>
-        </div>
-        <div>
-          <button onClick={getPrivateKey} className="card">
-            Get Private Key
-          </button>
-        </div>
-        <div>
-          <button onClick={logout} className="card">
-            Log Out
-          </button>
-        </div>
-      </div>
-      <div id="console" style={{ whiteSpace: "pre-line" }}>
-        <p style={{ whiteSpace: "pre-line" }}>Logged in Successfully!</p>
-      </div>
-    </>
-  );
+  // const loggedInView = (
+  //   <>
+  //     <div className="flex-container">
+  //       <div>
+  //         <button onClick={getUserInfo} className="card">
+  //           Get User Info
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={authenticateUser} className="card">
+  //           Get ID Token
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={getChainId} className="card">
+  //           Get Chain ID
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={getAccounts} className="card">
+  //           Get Accounts
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={getBalance} className="card">
+  //           Get Balance
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={signMessage} className="card">
+  //           Sign Message
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={sendTransaction} className="card">
+  //           Send Transaction
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={getPrivateKey} className="card">
+  //           Get Private Key
+  //         </button>
+  //       </div>
+  //       <div>
+  //         <button onClick={logout} className="card">
+  //           Log Out
+  //         </button>
+  //       </div>
+  //     </div>
+  //     <div id="console" style={{ whiteSpace: "pre-line" }}>
+  //       <p style={{ whiteSpace: "pre-line" }}>Logged in Successfully!</p>
+  //     </div>
+  //   </>
+  // );
 
-  const unloggedInView = (
-    <button onClick={login} className="card">
-      Login
-    </button>
-  );
+  // const unloggedInView = (
+  //   <button onClick={login} className="card">
+  //     Login
+  //   </button>
+  // );
 
   return (
     <div className="container">
@@ -243,7 +254,11 @@ export const App = ()  => {
         & ReactJS Example using Auth01
       </h1>
 
-      <div className="grid">{provider ? loggedInView : unloggedInView}</div>
+      <button onClick={login} className="card">
+        Login
+      </button>
+
+      {/* <div className="grid">{provider ? loggedInView : unloggedInView}</div> */}
       <Link to="/callback">
         <a>callback</a>
       </Link>
