@@ -38,17 +38,19 @@ export const Callback = () => {
             chainId: "0x137",
           },
           web3AuthNetwork: "testnet",
-          useCoreKitKey: false,
+          // useCoreKitKey: false,
+          useCoreKitKey: true,
         });
 
         const openloginAdapter = new OpenloginAdapter({
           adapterSettings: {
             clientId,
-            uxMode: "popup",
+            // uxMode: "popup",
             loginConfig: {
               jwt: {
                 verifier: "custom-sinhto-testnet",
                 typeOfLogin: "jwt",
+                clientId,
               },
             },
           },
@@ -70,7 +72,7 @@ export const Callback = () => {
 
   const login = async () => {
     
-
+    
     if (!web3auth) {
       uiConsole("web3auth not initialized yet");
       return;
@@ -83,6 +85,7 @@ export const Callback = () => {
           // domain: "https://shahbaz-torus.us.auth0.com",
           verifierIdField: "sub",
           id_token: query.get("token"),
+          domain: "https://hirosekakeru.github.io/"
           // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
         },
       }
