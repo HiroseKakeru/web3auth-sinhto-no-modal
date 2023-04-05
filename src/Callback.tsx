@@ -253,10 +253,6 @@ export const Callback = () => {
         & ReactJS Example using Auth01
       </h1>
 
-      <button onClick={login} className="card">
-        Login
-      </button>
-
       <div className="grid">{provider ? loggedInView : unloggedInView}</div>
 
       <footer className="footer">
@@ -264,3 +260,4 @@ export const Callback = () => {
     </div>
   );
 }
+
