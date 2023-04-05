@@ -15,9 +15,9 @@ import RPC from "./web3RPC"; // for using web3.js
 const clientId = process.env.REACT_APP_CLIENT_ID!
 
 const useQuery = () => {
-    const { search } = useLocation();
-  
-    return useMemo(() => new URLSearchParams(search), [search]);
+  const { search } = useLocation();
+
+  return useMemo(() => new URLSearchParams(search), [search]);
 };
 
 export const Callback = () => {
@@ -28,51 +28,53 @@ export const Callback = () => {
 
   const query = useQuery();
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const web3auth = new Web3AuthNoModal({
-          clientId,
-          chainConfig: {
-            chainNamespace: CHAIN_NAMESPACES.EIP155,
-            chainId: "0x137",
-          },
-          web3AuthNetwork: "testnet",
-          // useCoreKitKey: false,
-          useCoreKitKey: true,
-        });
+  const init = async () => {
+    try {
+      const web3auth = new Web3AuthNoModal({
+        clientId,
+        chainConfig: {
+          chainNamespace: CHAIN_NAMESPACES.EIP155,
+          chainId: "0x137",
+        },
+        web3AuthNetwork: "testnet",
+        // useCoreKitKey: false,
+        useCoreKitKey: true,
+      });
 
-        const openloginAdapter = new OpenloginAdapter({
-          adapterSettings: {
-            clientId,
-            // uxMode: "popup",
-            loginConfig: {
-              jwt: {
-                verifier: "custom-sinhto-testnet",
-                typeOfLogin: "jwt",
-                clientId,
-              },
+      const openloginAdapter = new OpenloginAdapter({
+        adapterSettings: {
+          clientId,
+          // uxMode: "popup",
+          loginConfig: {
+            jwt: {
+              verifier: "custom-sinhto-testnet",
+              typeOfLogin: "jwt",
+              clientId,
             },
           },
-        });
-        web3auth.configureAdapter(openloginAdapter);
-        setWeb3auth(web3auth);
+        },
+      });
+      web3auth.configureAdapter(openloginAdapter);
+      setWeb3auth(web3auth);
 
-        await web3auth.init();
-        if (web3auth.provider) {
-          setProvider(web3auth.provider);
-        }
-      } catch (error) {
-        console.error(error);
+      await web3auth.init();
+      if (web3auth.provider) {
+        setProvider(web3auth.provider);
       }
-    };
-
-    init();
-  }, []);
+      console.log("init completed");
+      
+    } catch (error) {
+      console.log(error);
+      
+      console.error(error);
+    }
+  };
 
   const login = async () => {
+    await init();
+    console.log("initialized");
     
-    
+
     if (!web3auth) {
       uiConsole("web3auth not initialized yet");
       return;
@@ -91,6 +93,8 @@ export const Callback = () => {
       }
     );
     setProvider(web3authProvider);
+    console.log("setProvider completed");
+    
   };
 
   const authenticateUser = async () => {
