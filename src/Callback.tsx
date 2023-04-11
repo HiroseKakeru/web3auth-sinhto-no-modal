@@ -292,7 +292,7 @@ export const Callback = () => {
           </button>
         </div>
         <div>
-          <button className='cta-button mint-button' onClick={safeMint}>
+          <button className="card" onClick={safeMint}>
             Mint
           </button>
         </div>
