@@ -13,9 +13,12 @@ import "./App.css";
 import RPC from "./web3RPC"; // for using web3.js
 // Plugins
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
+import { ethers } from "ethers";
+import { networks } from './utils/networks.js';
+import contractAbi from "./utils/contractABI.json";
 
 const clientId = process.env.REACT_APP_CLIENT_ID!
-
+const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS!
 const useQuery = () => {
   const { search } = useLocation();
 
@@ -31,6 +34,7 @@ export const Callback = () => {
     useState<TorusWalletConnectorPlugin | null>(null);
 
   const query = useQuery();
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -92,9 +96,7 @@ export const Callback = () => {
   }, []);
 
   const login = async () => {
-
     console.log("initialized");
-
 
     if (!web3auth) {
       uiConsole("web3auth not initialized yet");
@@ -211,6 +213,36 @@ export const Callback = () => {
     uiConsole(privateKey);
   };
 
+  const safeMint = async () => {
+    try {
+      if (provider) {
+        // const provider = new ethers.providers.Web3Provider(ethereum);
+        const web3authprovider = new ethers.providers.Web3Provider(provider);
+        const signer = web3authprovider.getSigner();
+        const contract = new ethers.Contract(
+          contractAddress,
+          contractAbi.abi,
+          signer
+        );
+
+        console.log("Going to pop wallet now to pay gas...");
+        let tx = await contract.safeMint();
+        const receipt = await tx.wait();
+
+        // トランザクションが問題なく実行されたか確認します。
+        if (receipt.status === 1) {
+          console.log(
+            "SBT minted! https://mumbai.polygonscan.com/tx/" + tx.hash
+          );
+        } else {
+          alert("Transaction failed! Please try again");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const loggedInView = (
     <>
       <div className="flex-container">
@@ -257,6 +289,11 @@ export const Callback = () => {
         <div>
           <button onClick={logout} className="card">
             Log Out
+          </button>
+        </div>
+        <div>
+          <button className='cta-button mint-button' onClick={safeMint}>
+            Mint
           </button>
         </div>
       </div>
