@@ -12,7 +12,7 @@ import "./App.css";
 // import RPC from './ethersRPC' // for using ethers.js
 import RPC from "./web3RPC"; // for using web3.js
 // Plugins
-// import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
+import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 
 const clientId = process.env.REACT_APP_CLIENT_ID!
 
@@ -27,8 +27,8 @@ export const Callback = () => {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  // const [torusPlugin, setTorusPlugin] =
-  //   useState<TorusWalletConnectorPlugin | null>(null);
+  const [torusPlugin, setTorusPlugin] =
+    useState<TorusWalletConnectorPlugin | null>(null);
 
   const query = useQuery();
 
@@ -38,11 +38,10 @@ export const Callback = () => {
         clientId,
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: "0x137",
+          chainId: "0x13881",
         },
         web3AuthNetwork: "testnet",
-        // useCoreKitKey: false,
-        useCoreKitKey: true,
+        useCoreKitKey: false,
       });
 
       const openloginAdapter = new OpenloginAdapter({
@@ -60,20 +59,20 @@ export const Callback = () => {
       });
       web3auth.configureAdapter(openloginAdapter);
       
-      // const torusPlugin = new TorusWalletConnectorPlugin({
-      //   torusWalletOpts: {},
-      //   walletInitOptions: {
-      //     whiteLabel: {
-      //       theme: { isDark: true, colors: { primary: "#00a8ff" } },
-      //       logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
-      //       logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
-      //     },
-      //     useWalletConnect: true,
-      //     enableLogging: true,
-      //   },
-      // });
-      // setTorusPlugin(torusPlugin);
-      // await web3auth.addPlugin(torusPlugin);
+      const torusPlugin = new TorusWalletConnectorPlugin({
+        torusWalletOpts: {},
+        walletInitOptions: {
+          whiteLabel: {
+            theme: { isDark: true, colors: { primary: "#00a8ff" } },
+            logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+            logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
+          },
+          useWalletConnect: true,
+          enableLogging: true,
+        },
+      });
+      setTorusPlugin(torusPlugin);
+      await web3auth.addPlugin(torusPlugin);
 
       setWeb3auth(web3auth);
 
@@ -107,7 +106,7 @@ export const Callback = () => {
           // domain: "https://shahbaz-torus.us.auth0.com",
           verifierIdField: "sub",
           id_token: query.get("token"),
-          domain: "https://hirosekakeru.github.io/"
+          domain: "https://auth-dev.su-pay.jp"
           // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
         },
       }
