@@ -11,6 +11,8 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import "./App.css";
 // import RPC from './ethersRPC' // for using ethers.js
 import RPC from "./web3RPC"; // for using web3.js
+// Plugins
+import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 
 const clientId = process.env.REACT_APP_CLIENT_ID!
 
@@ -25,6 +27,8 @@ export const Callback = () => {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
+  const [torusPlugin, setTorusPlugin] =
+    useState<TorusWalletConnectorPlugin | null>(null);
 
   const query = useQuery();
 
@@ -55,6 +59,22 @@ export const Callback = () => {
         },
       });
       web3auth.configureAdapter(openloginAdapter);
+      
+      const torusPlugin = new TorusWalletConnectorPlugin({
+        torusWalletOpts: {},
+        walletInitOptions: {
+          whiteLabel: {
+            theme: { isDark: true, colors: { primary: "#00a8ff" } },
+            logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+            logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
+          },
+          useWalletConnect: true,
+          enableLogging: true,
+        },
+      });
+      setTorusPlugin(torusPlugin);
+      await web3auth.addPlugin(torusPlugin);
+
       setWeb3auth(web3auth);
 
       await web3auth.init();
