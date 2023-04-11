@@ -41,7 +41,7 @@ export const Callback = () => {
           chainId: "0x13881",
         },
         web3AuthNetwork: "testnet",
-        useCoreKitKey: true,
+        useCoreKitKey: false,
       });
 
       const openloginAdapter = new OpenloginAdapter({
