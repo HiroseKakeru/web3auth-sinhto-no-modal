@@ -31,68 +31,70 @@ export const Callback = () => {
     useState<TorusWalletConnectorPlugin | null>(null);
 
   const query = useQuery();
-
-  const init = async () => {
-    try {
-      const web3auth = new Web3AuthNoModal({
-        clientId,
-        chainConfig: {
-          chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: "0x13881",
-        },
-        web3AuthNetwork: "testnet",
-        useCoreKitKey: false,
-      });
-
-      const openloginAdapter = new OpenloginAdapter({
-        adapterSettings: {
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const web3auth = new Web3AuthNoModal({
           clientId,
-          // uxMode: "popup",
-          loginConfig: {
-            jwt: {
-              verifier: "custom-sinhto-testnet",
-              typeOfLogin: "jwt",
-              clientId,
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x13881",
+          },
+          web3AuthNetwork: "testnet",
+          useCoreKitKey: false,
+        });
+
+        const openloginAdapter = new OpenloginAdapter({
+          adapterSettings: {
+            clientId,
+            // uxMode: "popup",
+            loginConfig: {
+              jwt: {
+                verifier: "custom-sinhto-testnet",
+                typeOfLogin: "jwt",
+                clientId,
+              },
             },
           },
-        },
-      });
-      web3auth.configureAdapter(openloginAdapter);
-      
-      const torusPlugin = new TorusWalletConnectorPlugin({
-        torusWalletOpts: {},
-        walletInitOptions: {
-          whiteLabel: {
-            theme: { isDark: true, colors: { primary: "#00a8ff" } },
-            logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
-            logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
+        });
+        web3auth.configureAdapter(openloginAdapter);
+
+        const torusPlugin = new TorusWalletConnectorPlugin({
+          torusWalletOpts: {},
+          walletInitOptions: {
+            whiteLabel: {
+              theme: { isDark: true, colors: { primary: "#00a8ff" } },
+              logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+              logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
+            },
+            useWalletConnect: true,
+            enableLogging: true,
           },
-          useWalletConnect: true,
-          enableLogging: true,
-        },
-      });
-      setTorusPlugin(torusPlugin);
-      await web3auth.addPlugin(torusPlugin);
+        });
+        setTorusPlugin(torusPlugin);
+        await web3auth.addPlugin(torusPlugin);
 
-      setWeb3auth(web3auth);
+        setWeb3auth(web3auth);
 
-      await web3auth.init();
-      if (web3auth.provider) {
-        setProvider(web3auth.provider);
+        await web3auth.init();
+        if (web3auth.provider) {
+          setProvider(web3auth.provider);
+        }
+        console.log("init completed");
+
+      } catch (error) {
+        console.log(error);
+
+        console.error(error);
       }
-      console.log("init completed");
-      
-    } catch (error) {
-      console.log(error);
-      
-      console.error(error);
-    }
-  };
+    };
+    init();
+  }, []);
 
   const login = async () => {
-    await init();
+
     console.log("initialized");
-    
+
 
     if (!web3auth) {
       uiConsole("web3auth not initialized yet");
@@ -113,7 +115,7 @@ export const Callback = () => {
     );
     setProvider(web3authProvider);
     console.log("setProvider completed");
-    
+
   };
 
   const authenticateUser = async () => {
