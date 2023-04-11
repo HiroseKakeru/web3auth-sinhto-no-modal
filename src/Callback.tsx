@@ -41,7 +41,7 @@ export const Callback = () => {
           chainId: "0x13881",
         },
         web3AuthNetwork: "testnet",
-        useCoreKitKey: false,
+        useCoreKitKey: true,
       });
 
       const openloginAdapter = new OpenloginAdapter({
@@ -106,7 +106,7 @@ export const Callback = () => {
           // domain: "https://shahbaz-torus.us.auth0.com",
           verifierIdField: "sub",
           id_token: query.get("token"),
-          domain: "https://hirosekakeru.github.io"
+          domain: "https://hirosekakeru.github.io/"
           // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
         },
       }
