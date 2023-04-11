@@ -106,7 +106,7 @@ export const Callback = () => {
           // domain: "https://shahbaz-torus.us.auth0.com",
           verifierIdField: "sub",
           id_token: query.get("token"),
-          domain: "https://auth-dev.su-pay.jp"
+          domain: "https://hirosekakeru.github.io"
           // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
         },
       }
