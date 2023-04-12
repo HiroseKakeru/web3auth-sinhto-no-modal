@@ -1,249 +1,35 @@
 import { useEffect, useState } from "react";
-import { Web3AuthNoModal } from "@web3auth/no-modal";
-import {
-  WALLET_ADAPTERS,
-  CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
-} from "@web3auth/base";
-import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import "./App.css";
 // import RPC from './ethersRPC' // for using ethers.js
-import RPC from "./web3RPC"; // for using web3.js
-import { Link, redirect } from 'react-router-dom';
+// import RPC from "./web3RPC"; // for using web3.js
+import { Link } from 'react-router-dom';
 
-const clientId = process.env.REACT_APP_CLIENT_ID!
 const houzinURL = process.env.REACT_APP_HOUZIN_URL!
 
 export const App = () => {
-  const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
-    null
-  );
+  const [authEndpoint, setAuthEndpoint] = useState();
 
   useEffect(() => {
     const init = async () => {
-      try {
-        const web3auth = new Web3AuthNoModal({
-          clientId,
-          chainConfig: {
-            chainNamespace: CHAIN_NAMESPACES.EIP155,
-            chainId: "0x137",
-          },
-          web3AuthNetwork: "testnet",
-          useCoreKitKey: false,
-        });
-
-        const openloginAdapter = new OpenloginAdapter({
-          adapterSettings: {
-            clientId,
-            uxMode: "popup",
-            loginConfig: {
-              jwt: {
-                verifier: "custom-sinhto-testnet",
-                typeOfLogin: "jwt",
-              },
-            },
-          },
-        });
-        web3auth.configureAdapter(openloginAdapter);
-        setWeb3auth(web3auth);
-
-        await web3auth.init();
-        if (web3auth.provider) {
-          setProvider(web3auth.provider);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+      const res = await fetch(houzinURL + "/supay/login", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      setAuthEndpoint(data?.data.sinhto_url);
+      console.log(authEndpoint);
     };
 
     init();
   }, []);
 
-  const login = async () => {
-    const res = await fetch(houzinURL + "/supay/login", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-    const url = data?.data.sinhto_url;
-    console.log(url);
-    // ↓リダイレクトできていない
-    return redirect(url);
-
-    // if (!web3auth) {
-    //   uiConsole("web3auth not initialized yet");
-    //   return;
-    // }
-    // const web3authProvider = await web3auth.connectTo(
-    //   WALLET_ADAPTERS.OPENLOGIN,
-    //   {
-    //     loginProvider: "jwt",
-    //     extraLoginOptions: {
-    //       domain: "https://shahbaz-torus.us.auth0.com",
-    //       verifierIdField: "sub",
-    //       // connection: "google-oauth2", // Use this to skip Auth0 Modal for Google login.
-    //     },
-    //   }
-    // );
-    // setProvider(web3authProvider);
-  };
-
-  const authenticateUser = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    const idToken = await web3auth.authenticateUser();
-    uiConsole(idToken);
-  };
-
-  const getUserInfo = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    const user = await web3auth.getUserInfo();
-    uiConsole(user);
-  };
-
-  const logout = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    await web3auth.logout();
-    setProvider(null);
-  };
-
-  const getChainId = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const chainId = await rpc.getChainId();
-    uiConsole(chainId);
-  };
-  const getAccounts = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const address = await rpc.getAccounts();
-    uiConsole(address);
-  };
-
-  const getBalance = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const balance = await rpc.getBalance();
-    uiConsole(balance);
-  };
-
-  const sendTransaction = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const receipt = await rpc.sendTransaction();
-    uiConsole(receipt);
-  };
-
-  const signMessage = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const signedMessage = await rpc.signMessage();
-    uiConsole(signedMessage);
-  };
-
-  function uiConsole(...args: any[]): void {
-    const el = document.querySelector("#console>p");
-    if (el) {
-      el.innerHTML = JSON.stringify(args || {}, null, 2);
-    }
-  }
-
-  const getPrivateKey = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const privateKey = await rpc.getPrivateKey();
-    uiConsole(privateKey);
-  };
-
-  // const loggedInView = (
-  //   <>
-  //     <div className="flex-container">
-  //       <div>
-  //         <button onClick={getUserInfo} className="card">
-  //           Get User Info
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={authenticateUser} className="card">
-  //           Get ID Token
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={getChainId} className="card">
-  //           Get Chain ID
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={getAccounts} className="card">
-  //           Get Accounts
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={getBalance} className="card">
-  //           Get Balance
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={signMessage} className="card">
-  //           Sign Message
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={sendTransaction} className="card">
-  //           Send Transaction
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={getPrivateKey} className="card">
-  //           Get Private Key
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={logout} className="card">
-  //           Log Out
-  //         </button>
-  //       </div>
-  //     </div>
-  //     <div id="console" style={{ whiteSpace: "pre-line" }}>
-  //       <p style={{ whiteSpace: "pre-line" }}>Logged in Successfully!</p>
-  //     </div>
-  //   </>
-  // );
-
-  // const unloggedInView = (
-  //   <button onClick={login} className="card">
-  //     Login
-  //   </button>
-  // );
+  const login = (
+    <Link to={authEndpoint!}>
+      sinhto Login
+    </Link>
+  );
 
   return (
     <div className="container">
@@ -254,14 +40,11 @@ export const App = () => {
         & ReactJS Example using Auth01
       </h1>
 
-      <button onClick={login} className="card">
+      {/* <button onClick={login} className="card">
         Login
-      </button>
+      </button> */}
 
-      {/* <div className="grid">{provider ? loggedInView : unloggedInView}</div> */}
-      <Link to="/callback">
-        <a>callback</a>
-      </Link>
+      <div className="card">{login}</div>
 
       <footer className="footer">
         <a

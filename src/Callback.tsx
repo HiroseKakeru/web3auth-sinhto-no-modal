@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import {
@@ -34,6 +34,7 @@ export const Callback = () => {
     useState<TorusWalletConnectorPlugin | null>(null);
 
   const query = useQuery();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const init = async () => {
@@ -145,6 +146,7 @@ export const Callback = () => {
     }
     await web3auth.logout();
     setProvider(null);
+    navigate("/")
   };
 
   const getChainId = async () => {
