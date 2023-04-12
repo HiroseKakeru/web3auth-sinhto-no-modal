@@ -96,7 +96,7 @@ export const Callback = () => {
     init();
   }, []);
 
-  const login = async () => {
+  const connect = async () => {
     console.log("initialized");
 
     if (!web3auth) {
@@ -218,7 +218,6 @@ export const Callback = () => {
   const safeMint = async () => {
     try {
       if (provider) {
-        // const provider = new ethers.providers.Web3Provider(ethereum);
         const web3authprovider = new ethers.providers.Web3Provider(provider);
         const signer = web3authprovider.getSigner();
         const contract = new ethers.Contract(
@@ -306,8 +305,8 @@ export const Callback = () => {
   );
 
   const unloggedInView = (
-    <button onClick={login} className="card">
-      Login
+    <button onClick={connect} className="card">
+      Wollet connect
     </button>
   );
 
@@ -317,7 +316,7 @@ export const Callback = () => {
         <a target="_blank" href="http://web3auth.io/" rel="noreferrer">
           Web3Auth
         </a>{" "}
-        & ReactJS Example using Auth01
+        & Sinhto
       </h1>
 
       <div className="grid">{provider ? loggedInView : unloggedInView}</div>
