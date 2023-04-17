@@ -14,8 +14,10 @@ import RPC from "./web3RPC"; // for using web3.js
 // Plugins
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import { ethers } from "ethers";
-import { networks } from './utils/networks.js';
 import contractAbi from "./utils/contractABI.json";
+
+// Adapters
+import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 
 const clientId = process.env.REACT_APP_CLIENT_ID!
 const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS!
@@ -63,6 +65,31 @@ export const Callback = () => {
           },
         });
         web3auth.configureAdapter(openloginAdapter);
+
+        // adding metamask adapter
+        const metamaskAdapter = new MetamaskAdapter({
+          clientId,
+          sessionTime: 3600, // 1 hour in seconds
+          web3AuthNetwork: "testnet",
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x13881",
+            rpcTarget: "https://rpc.ankr.com/polygon_mumbai", // This is the public RPC we have added, please pass on your own endpoint while creating an app
+          },
+        });
+        // we can change the above settings using this function
+        metamaskAdapter.setAdapterSettings({
+          sessionTime: 86400, // 1 day in seconds
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x13881",
+            rpcTarget: "https://rpc.ankr.com/polygon_mumbai", // This is the public RPC we have added, please pass on your own endpoint while creating an app
+          },
+          web3AuthNetwork: "testnet",
+        });
+
+        // it will add/update  the metamask adapter in to web3auth class
+        web3auth.configureAdapter(metamaskAdapter);
 
         const torusPlugin = new TorusWalletConnectorPlugin({
           torusWalletOpts: {},
