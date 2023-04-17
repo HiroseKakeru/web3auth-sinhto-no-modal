@@ -37,6 +37,7 @@ export const Callback = () => {
 
   const query = useQuery();
   const navigate = useNavigate();
+  const [currentAccount, setCurrentAccount] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -146,6 +147,14 @@ export const Callback = () => {
     setProvider(web3authProvider);
     console.log("setProvider completed");
 
+    // metamask login
+    const { ethereum } = (window as any).window;
+    const accounts = await ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    console.log("Connected", accounts[0]);
+    setCurrentAccount(accounts[0]);
+
   };
 
   const authenticateUser = async () => {
@@ -244,8 +253,11 @@ export const Callback = () => {
 
   const safeMint = async () => {
     try {
-      if (provider) {
-        const web3authprovider = new ethers.providers.Web3Provider(provider);
+      const { ethereum } = (window as any).window;
+      // if (provider) {
+      if (ethereum) {
+        // const web3authprovider = new ethers.providers.Web3Provider(provider);
+        const web3authprovider = new ethers.providers.Web3Provider(ethereum);
         const signer = web3authprovider.getSigner();
         const contract = new ethers.Contract(
           contractAddress,
